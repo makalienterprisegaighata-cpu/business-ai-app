@@ -7,7 +7,7 @@ DB_NAME = "business.db"
 
 @app.get("/")
 def home():
-    return {"status": "Business AI App is running 🚀"}
+    return {"status": "Business AI App is running 🚀✅"}
 
 @app.get("/customers")
 def get_customers():
