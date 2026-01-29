@@ -2,7 +2,7 @@ from fastapi import FastAPI
 import sqlite3
 
 app = FastAPI()
-
+init_db()
 DB_NAME = "business.db"
 
 @app.get("/")
@@ -41,3 +41,15 @@ def add_customer(customer: Customer):
     conn.commit()
     conn.close()
     return {"message": "Customer added successfully"}
+def init_db():
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS customers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            phone TEXT
+        )
+    """)
+    conn.commit()
+    conn.close()
