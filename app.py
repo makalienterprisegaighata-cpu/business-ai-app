@@ -21,3 +21,6 @@ def get_customers():
         return {"customers": []}
     finally:
         conn.close()
+@app.get("/ping")
+def ping():
+    return {"message": "pong 🏓"}
