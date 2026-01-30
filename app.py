@@ -1,49 +1,24 @@
 from fastapi import FastAPI
 import sqlite3
 
-app = FastAPI()
-init_db()
-DB_NAME = "business.db"
+app = FastAPI(title="Vyapar AI")
 
+# ---------- Database ----------
+def get_db():
+    conn = sqlite3.connect("vyapar.db")
+    conn.row_factory = sqlite3.Row
+    return conn
+
+# ---------- Home ----------
 @app.get("/")
 def home():
-    return {"status": "Business AI App is running 🚀✅"}
+    return {"message": "Welcome to Vyapar AI 🚀"}
 
-@app.get("/customers")
-def get_customers():
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-    try:
-        cursor.execute("SELECT name, phone FROM customers")
-        rows = cursor.fetchall()
-        return {"customers": rows}
-    except:
-        return {"customers": []}
-    finally:
-        conn.close()
-@app.get("/ping")
-def ping():
-    return {"message": "pong 🏓"}
-from pydantic import BaseModel
-
-class Customer(BaseModel):
-    name: str
-    phone: str
-
-@app.post("/customers")
-def add_customer(customer: Customer):
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-    cursor.execute(
-        "INSERT INTO customers (name, phone) VALUES (?, ?)",
-        (customer.name, customer.phone)
-    )
-    conn.commit()
-    conn.close()
-    return {"message": "Customer added successfully"}
-def init_db():
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
+# ---------- Add Customer ----------
+@app.post("/customer/add")
+def add_customer(name: str, phone: str):
+    db = get_db()
+    cursor = db.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS customers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -51,5 +26,18 @@ def init_db():
             phone TEXT
         )
     """)
-    conn.commit()
-    conn.close()
+    cursor.execute(
+        "INSERT INTO customers (name, phone) VALUES (?, ?)",
+        (name, phone)
+    )
+    db.commit()
+    return {"status": "Customer added successfully 💚"}
+
+# ---------- List Customers ----------
+@app.get("/customers")
+def list_customers():
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM customers")
+    rows = cursor.fetchall()
+    return {"customers": [dict(row) for row in rows]}
