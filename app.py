@@ -46,3 +46,23 @@ def ai_ask(data: dict = Body(...)):
     return {
         "answer": "দুঃখিত, আমি প্রশ্নটা বুঝতে পারিনি।"
     }
+from fastapi import Body
+import requests
+
+@api.post("/ai/ask")
+def ai_ask(data: dict = Body(...)):
+    question = data.get("question")
+
+    # First version simple AI logic
+    if "Rahul" in question and "বাকি" in question:
+        res = requests.get("https://business-ai-app.onrender.com/balance/1")
+        info = res.json()
+        balance = info["total_balance"]
+
+        return {
+            "answer": f"Rahul এর মোট বাকি আছে {balance} টাকা।"
+        }
+
+    return {
+        "answer": "দুঃখিত, আমি প্রশ্নটা বুঝতে পারিনি।"
+    }
