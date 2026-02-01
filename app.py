@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 import sqlite3
-
+from auth import router as auth_router
 app = FastAPI(title="Vyapar AI")
-
+app.include_router(auth_router)
 # ---------- Database ----------
 def get_db():
     conn = sqlite3.connect("vyapar.db")
