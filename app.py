@@ -114,3 +114,73 @@ def get_transactions(customer_id: int):
         "customer_id": customer_id,
         "transactions": data
     }
+from fastapi.responses import FileResponse
+from fpdf import FPDF
+import os
+
+# ===== OPTION A: BALANCE API =====
+@app.get("/balance/{customer_id}")
+def get_balance(customer_id: int):
+    conn = sqlite3.connect("vyapar.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT name FROM customers WHERE id=?", (customer_id,))
+    customer = cursor.fetchone()
+
+    if not customer:
+        return {"error": "Customer not found"}
+
+    cursor.execute(
+        "SELECT SUM(amount) FROM transactions WHERE customer_id=?",
+        (customer_id,)
+    )
+    total = cursor.fetchone()[0] or 0
+
+    conn.close()
+
+    return {
+        "customer_id": customer_id,
+        "customer_name": customer[0],
+        "total_balance": total
+    }
+
+
+# ===== OPTION B: PDF STATEMENT =====
+@app.get("/statement/pdf/{customer_id}")
+def generate_pdf(customer_id: int):
+    conn = sqlite3.connect("vyapar.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT name FROM customers WHERE id=?", (customer_id,))
+    customer = cursor.fetchone()
+    if not customer:
+        return {"error": "Customer not found"}
+
+    cursor.execute(
+        "SELECT amount, note, date FROM transactions WHERE customer_id=?",
+        (customer_id,)
+    )
+    transactions = cursor.fetchall()
+    conn.close()
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+
+    pdf.cell(200, 10, txt=f"Vyapar AI Statement", ln=True)
+    pdf.cell(200, 10, txt=f"Customer: {customer[0]}", ln=True)
+    pdf.ln(10)
+
+    total = 0
+    for t in transactions:
+        amount, note, date = t
+        total += amount
+        pdf.cell(200, 10, txt=f"{date} | {amount} | {note}", ln=True)
+
+    pdf.ln(10)
+    pdf.cell(200, 10, txt=f"Total Balance: {total}", ln=True)
+
+    filename = f"statement_{customer_id}.pdf"
+    pdf.output(filename)
+
+    return FileResponse(filename, media_type="application/pdf", filename=filename)
