@@ -1,40 +1,45 @@
-from fastapi import FastAPI, Request
-from openai import OpenAI
-import os
+from fastapi import FastAPI, Body
+import requests
 
-app = FastAPI()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+app = FastAPI(title="Vyapar AI")
 
+# -------------------------
+# BASIC TEST ROUTE
+# -------------------------
 @app.get("/")
-def root():
+def home():
     return {"message": "Welcome to Vyapar AI 🚀"}
 
-@app.post("/chat")
-async def chat(request: Request):
-    data = await request.json()
-    user_message = data.get("message")
 
-    response = client.responses.create(
-        model="gpt-5.2",
-        input=f"You are Vyapar AI, a smart business assistant. Answer in simple Bengali.\nUser: {user_message}"
-    )
+# -------------------------
+# CUSTOMER API (DUMMY)
+# -------------------------
+@app.post("/customer/add")
+def add_customer(name: str, phone: str):
+    return {"status": "Customer added successfully ✅"}
 
-    return {
-        "reply": response.output_text
-    }
-from fastapi import Body
-import requests
-import os
 
-AI_API_KEY = os.getenv("OPENAI_API_KEY")  # Render env থেকে আসবে
+@app.get("/balance/{customer_id}")
+def get_balance(customer_id: int):
+    # Dummy data (later DB হবে)
+    if customer_id == 1:
+        return {
+            "customer_id": 1,
+            "customer_name": "Rahul",
+            "total_balance": 2000
+        }
+    return {"error": "Customer not found"}
 
-@api.post("/ai/ask")
+
+# -------------------------
+# AI BRAIN (MAIN PART)
+# -------------------------
+@app.post("/ai/ask")
 def ai_ask(data: dict = Body(...)):
-    question = data.get("question")
+    question = data.get("question", "").lower()
 
-    # খুব simple NLP logic (first version)
-    if "Rahul" in question and "বাকি" in question:
-        # Backend থেকে balance আনো
+    # Simple AI logic v1
+    if "rahul" in question and ("বাকি" in question or "balance" in question):
         res = requests.get("https://business-ai-app.onrender.com/balance/1")
         info = res.json()
         balance = info["total_balance"]
@@ -44,25 +49,5 @@ def ai_ask(data: dict = Body(...)):
         }
 
     return {
-        "answer": "দুঃখিত, আমি প্রশ্নটা বুঝতে পারিনি।"
-    }
-from fastapi import Body
-import requests
-
-@api.post("/ai/ask")
-def ai_ask(data: dict = Body(...)):
-    question = data.get("question")
-
-    # First version simple AI logic
-    if "Rahul" in question and "বাকি" in question:
-        res = requests.get("https://business-ai-app.onrender.com/balance/1")
-        info = res.json()
-        balance = info["total_balance"]
-
-        return {
-            "answer": f"Rahul এর মোট বাকি আছে {balance} টাকা।"
-        }
-
-    return {
-        "answer": "দুঃখিত, আমি প্রশ্নটা বুঝতে পারিনি।"
+        "answer": "দুঃখিত, আমি প্রশ্নটা বুঝতে পারিনি 😅"
     }
