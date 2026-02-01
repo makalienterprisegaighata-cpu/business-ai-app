@@ -41,3 +41,26 @@ def list_customers():
     cursor.execute("SELECT * FROM customers")
     rows = cursor.fetchall()
     return {"customers": [dict(row) for row in rows]}
+# ---------- Add Transaction ----------
+@app.post("/transaction/add")
+def add_transaction(customer_id: int, amount: float, note: str = ""):
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS transactions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            customer_id INTEGER,
+            amount REAL,
+            note TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    cursor.execute(
+        "INSERT INTO transactions (customer_id, amount, note) VALUES (?, ?, ?)",
+        (customer_id, amount, note)
+    )
+
+    db.commit()
+    return {"status": "Transaction added successfully 💸"}
