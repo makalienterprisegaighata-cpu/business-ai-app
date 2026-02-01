@@ -13,23 +13,15 @@ def home():
 def ai_ask(data: dict = Body(...)):
     question = data.get("question", "").lower()
 
-    # Simple AI Logic v1
-    if "rahul" in question and "balance" in question:
+    if "rahul" in question and ("বাকি" in question or "balance" in question):
         res = requests.get("https://business-ai-app.onrender.com/balance/1")
         info = res.json()
         balance = info["total_balance"]
 
         return {
-            "answer": f"Rahul এর মোট ব্যালেন্স হলো {balance} টাকা 💰"
-        }
-
-    if "customers" in question:
-        res = requests.get("https://business-ai-app.onrender.com/customers")
-        customers = res.json()
-        return {
-            "answer": f"মোট {len(customers)} জন কাস্টমার আছে 👥"
+            "answer": f"Rahul এর মোট বাকি আছে {balance} টাকা"
         }
 
     return {
-        "answer": "দুঃখিত 😅, আমি প্রশ্নটা বুঝতে পারিনি"
+        "answer": "দুঃখিত, আমি প্রশ্নটা বুঝতে পারিনি 😅"
     }
