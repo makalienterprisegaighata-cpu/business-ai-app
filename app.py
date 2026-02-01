@@ -64,3 +64,28 @@ def add_transaction(customer_id: int, amount: float, note: str = ""):
 
     db.commit()
     return {"status": "Transaction added successfully 💸"}
+# ---------- List Transactions by Customer ----------
+@app.get("/transactions/{customer_id}")
+def get_transactions(customer_id: int):
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute(
+        "SELECT id, amount, note, created_at FROM transactions WHERE customer_id = ?",
+        (customer_id,)
+    )
+    rows = cursor.fetchall()
+
+    data = []
+    for row in rows:
+        data.append({
+            "id": row[0],
+            "amount": row[1],
+            "note": row[2],
+            "date": row[3]
+        })
+
+    return {
+        "customer_id": customer_id,
+        "transactions": data
+    }
