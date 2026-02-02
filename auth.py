@@ -1,32 +1,40 @@
-from fastapi import APIRouter
-import sqlite3
-import hashlib
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+import openai
+import os
 
-router = APIRouter()
+app = FastAPI()
 
-def hash_password(p):
-    return hashlib.sha256(p.encode()).hexdigest()
+# CORS (HTML থেকে কল করার জন্য)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@router.post("/auth/register")
-def register(name: str, email: str, password: str):
-    conn = sqlite3.connect("vyapar.db")
-    c = conn.cursor()
-    c.execute("INSERT INTO users VALUES (NULL,?,?,?)",
-              (name, email, hash_password(password)))
-    conn.commit()
-    conn.close()
-    return {"status": "User registered successfully"}
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
-@router.post("/auth/login")
-def login(email: str, password: str):
-    conn = sqlite3.connect("vyapar.db")
-    c = conn.cursor()
-    c.execute("SELECT * FROM users WHERE email=? AND password=?",
-              (email, hash_password(password)))
-    user = c.fetchone()
-    conn.close()
+class Question(BaseModel):
+    question: str
 
-    if user:
-        return {"status": "Login success", "user_id": user[0]}
-    else:
-        return {"error": "Invalid credentials"}
+@app.get("/")
+def home():
+    return {"message": "Vyapar AI Backend Running"}
+
+@app.post("/ai/ask")
+async def ask_ai(q: Question):
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "তুমি একজন ব্যবসায় সহায়ক বাংলা AI"},
+                {"role": "user", "content": q.question}
+            ]
+        )
+        answer = response["choices"][0]["message"]["content"]
+        return {"answer": answer}
+    except Exception as e:
+        return {"answer": str(e)}
