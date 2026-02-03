@@ -1,101 +1,48 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Vyapar AI</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
       background: #0f0f0f;
       color: white;
       font-family: Arial;
       text-align: center;
-      padding: 20px;
+      padding: 30px;
     }
     textarea {
       width: 90%;
-      height: 100px;
+      height: 120px;
       font-size: 18px;
+      border-radius: 10px;
       padding: 10px;
-      border-radius: 8px;
     }
     button {
-      margin: 10px;
-      padding: 12px 20px;
       font-size: 18px;
-      border-radius: 8px;
-      cursor: pointer;
+      padding: 10px 20px;
+      margin: 10px;
+      border-radius: 10px;
     }
-    #result {
+    #response {
       margin-top: 20px;
       background: #222;
       padding: 15px;
-      border-radius: 8px;
-      min-height: 60px;
-      text-align: left;
+      border-radius: 10px;
     }
   </style>
 </head>
 <body>
 
-<h1>🤖 Vyapar AI</h1>
+  <h1>🤖 Vyapar AI</h1>
 
-<textarea id="question" placeholder="লিখে প্রশ্ন করো বা মাইক চাপো..."></textarea><br>
+  <textarea id="question" placeholder="এখানে প্রশ্ন বলো বা লেখো..."></textarea><br>
 
-<button onclick="startVoice()">🎤 Speak</button>
-<button onclick="askAI()">Ask AI</button>
+  <button onclick="startVoice()">🎤 Speak</button>
+  <button onclick="askAI()">Ask AI</button>
 
-<div id="result">উত্তর এখানে আসবে...</div>
+  <div id="response"></div>
 
-<script>
-/* ---------- Voice Input ---------- */
-function startVoice() {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const recognition = new SpeechRecognition();
-  recognition.lang = "bn-IN"; // বাংলা
-  recognition.start();
-
-  recognition.onresult = function(event) {
-    const text = event.results[0][0].transcript;
-    document.getElementById("question").value = text;
-  };
-}
-
-/* ---------- Ask AI ---------- */
-async function askAI() {
-  const q = document.getElementById("question").value;
-  const resultBox = document.getElementById("result");
-  resultBox.innerText = "লোড হচ্ছে... ⏳";
-
-  try {
-    const res = await fetch("https://business-ai-app.onrender.com/ai/ask", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ question: q })
-    });
-
-    const data = await res.json();
-    resultBox.innerText = data.answer || "কোনো উত্তর আসেনি 😢";
-
-    speak(data.answer); // AI কথা বলবে
-  } catch (err) {
-    resultBox.innerText = "এরর: " + err;
-  }
-}
-
-/* ---------- Voice Output ---------- */
-function speak(text) {
-  const speech = new SpeechSynthesisUtterance(text);
-  speech.lang = "bn-IN";
-  window.speechSynthesis.speak(speech);
-}
-</script>
-
+  <script src="script.js"></script>
 </body>
 </html>
-<link rel="manifest" href="manifest.json">
-<script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js");
-}
-</script>
