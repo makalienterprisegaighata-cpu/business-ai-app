@@ -5,3 +5,10 @@ self.addEventListener("install", function(event) {
 self.addEventListener("fetch", function(event) {
   event.respondWith(fetch(event.request));
 });
+self.addEventListener("install", function(event) {
+  console.log("Service Worker installed");
+});
+
+self.addEventListener("fetch", function(event) {
+  event.respondWith(fetch(event.request));
+});
