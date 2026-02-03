@@ -1,48 +1,51 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Vyapar AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
   <style>
     body {
-      background: #0f0f0f;
-      color: white;
-      font-family: Arial;
-      text-align: center;
-      padding: 30px;
+      background:#111;
+      color:white;
+      text-align:center;
+      font-family:Arial;
+      padding:30px;
     }
     textarea {
-      width: 90%;
-      height: 120px;
-      font-size: 18px;
-      border-radius: 10px;
-      padding: 10px;
+      width:90%;
+      height:120px;
+      font-size:18px;
+      border-radius:10px;
+      padding:10px;
     }
     button {
-      font-size: 18px;
-      padding: 10px 20px;
-      margin: 10px;
-      border-radius: 10px;
+      font-size:18px;
+      padding:12px 20px;
+      margin:10px;
+      border-radius:10px;
+      border:none;
     }
-    #response {
-      margin-top: 20px;
-      background: #222;
-      padding: 15px;
-      border-radius: 10px;
+    #answer {
+      margin-top:20px;
+      padding:15px;
+      background:#222;
+      border-radius:10px;
     }
   </style>
 </head>
 <body>
 
-  <h1>🤖 Vyapar AI</h1>
+<h1>🤖 Vyapar AI</h1>
 
-  <textarea id="question" placeholder="এখানে প্রশ্ন বলো বা লেখো..."></textarea><br>
+<textarea id="question" placeholder="এখানে বলো বা লেখো..."></textarea><br>
 
-  <button onclick="startVoice()">🎤 Speak</button>
-  <button onclick="askAI()">Ask AI</button>
+<button onclick="startVoice()">🎤 Speak</button>
+<button onclick="askAI()">Ask AI</button>
 
-  <div id="response"></div>
+<div id="answer"></div>
 
-  <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
