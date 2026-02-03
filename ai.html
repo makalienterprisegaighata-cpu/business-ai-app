@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="bn">
 <head>
   <meta charset="UTF-8">
   <title>Vyapar AI</title>
   <style>
     body {
-      background: #111;
+      background: #0f0f0f;
       color: white;
-      text-align: center;
       font-family: Arial;
+      text-align: center;
       padding-top: 50px;
     }
     textarea {
@@ -19,20 +19,19 @@
     }
     button {
       margin-top: 15px;
-      padding: 10px 20px;
+      padding: 10px 25px;
       font-size: 18px;
       cursor: pointer;
     }
-    #response {
-      margin-top: 30px;
+    #result {
+      margin-top: 20px;
       background: #222;
       padding: 15px;
+      border-radius: 5px;
       width: 80%;
       margin-left: auto;
       margin-right: auto;
-      border-radius: 8px;
       min-height: 50px;
-      text-align: left;
     }
   </style>
 </head>
@@ -40,26 +39,34 @@
 
 <h1>🤖 Vyapar AI</h1>
 
-<textarea id="question" placeholder="এখানে প্রশ্ন লেখো..."></textarea><br>
+<textarea id="question" placeholder="এখানে প্রশ্ন লিখো..."></textarea><br>
 <button onclick="askAI()">Ask AI</button>
 
-<div id="response">উত্তর এখানে দেখাবে...</div>
+<div id="result">উত্তর এখানে আসবে...</div>
 
 <script>
 async function askAI() {
   const q = document.getElementById("question").value;
-  document.getElementById("response").innerText = "লোড হচ্ছে...";
+  const resultBox = document.getElementById("result");
 
-  const res = await fetch("https://business-ai-app.onrender.com/ai/ask", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ question: q })
-  });
+  resultBox.innerText = "লোড হচ্ছে... ⏳";
 
-  const data = await res.json();
-  document.getElementById("response").innerText = data.answer || JSON.stringify(data);
+  try {
+    const res = await fetch("https://business-ai-app.onrender.com/ai/ask", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        question: q
+      })
+    });
+
+    const data = await res.json();
+    resultBox.innerText = data.answer || "কোনো উত্তর আসেনি 😢";
+  } catch (err) {
+    resultBox.innerText = "এরর হয়েছে: " + err;
+  }
 }
 </script>
 
