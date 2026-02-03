@@ -1,9 +1,15 @@
-from fastapi import FastAPI, Body
+from fastapi.middleware.cors import CORSMiddlewarefrom fastapi import FastAPI, Body
 import requests
 import sqlite3
 
 app = FastAPI(title="Vyapar AI")
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # ---------- Database ----------
 def get_db():
     conn = sqlite3.connect("business.db")
