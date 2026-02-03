@@ -1,27 +1,25 @@
 const API_URL = "https://business-ai-app.onrender.com/ai/ask";
 
-// Ask AI (text)
-async function askAI() {
-  const question = document.getElementById("question").value;
-  const responseDiv = document.getElementById("response");
-  responseDiv.innerHTML = "⏳ লোড হচ্ছে...";
+function askAI() {
+  const q = document.getElementById("question").value;
+  document.getElementById("answer").innerText = "লোড হচ্ছে...";
 
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ question })
-    });
-
-    const data = await res.json();
-    responseDiv.innerHTML = "🤖 " + data.answer;
-    speakText(data.answer);
-
-  } catch (err) {
-    responseDiv.innerHTML = "❌ Error: " + err;
-  }
+  fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ question: q })
+  })
+  .then(res => res.json())
+  .then(data => {
+    const ans = data.answer;
+    document.getElementById("answer").innerText = ans;
+    speak(ans);
+  })
+  .catch(err => {
+    document.getElementById("answer").innerText = "Error: " + err;
+  });
 }
 
 // Voice input
@@ -33,13 +31,12 @@ function startVoice() {
   recognition.onresult = function(event) {
     const text = event.results[0][0].transcript;
     document.getElementById("question").value = text;
-    askAI();
   };
 }
 
-// AI voice output
-function speakText(text) {
-  const speech = new SpeechSynthesisUtterance(text);
-  speech.lang = "bn-BD";
-  window.speechSynthesis.speak(speech);
+// Voice output
+function speak(text) {
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.lang = "bn-BD";
+  speechSynthesis.speak(msg);
 }
