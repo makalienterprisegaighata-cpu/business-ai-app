@@ -13,7 +13,7 @@ function askAI() {
   })
   .then(res => res.json())
   .then(data => {
-    const ans = data.message;
+    const ans = data.answer || data.message || data.result || JSON.stringify(data);
     document.getElementById("answer").innerText = ans;
     speak(ans);
   })
