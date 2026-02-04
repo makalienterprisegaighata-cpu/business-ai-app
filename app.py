@@ -18,4 +18,4 @@ app.add_middleware(
 # OpenAI client
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-class Question(BaseModel
+class Question(BaseModel):
